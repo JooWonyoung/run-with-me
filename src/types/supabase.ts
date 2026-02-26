@@ -68,7 +68,7 @@ export type Database = {
           status: string | null
           target_distance_km: number | null
           target_pace_minute: string | null
-          thumbnail_rul: string | null
+          thumbnail_url: string | null
           title: string
           view_count: number | null
         }
@@ -86,7 +86,7 @@ export type Database = {
           status?: string | null
           target_distance_km?: number | null
           target_pace_minute?: string | null
-          thumbnail_rul?: string | null
+          thumbnail_url?: string | null
           title: string
           view_count?: number | null
         }
@@ -104,15 +104,15 @@ export type Database = {
           status?: string | null
           target_distance_km?: number | null
           target_pace_minute?: string | null
-          thumbnail_rul?: string | null
+          thumbnail_url?: string | null
           title?: string
           view_count?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "Runs_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
+            foreignKeyName: "Runs_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
             referencedRelation: "User"
             referencedColumns: ["id"]
           },
