@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import QueryProvider from "@/providers/query-providers";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +31,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <QueryProvider>{children}</QueryProvider>
+        <Toaster richColors position="bottom-right" />
       </body>
     </html>
   );
