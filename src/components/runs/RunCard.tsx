@@ -1,35 +1,35 @@
-import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { Activity, Calendar, MapPin, Users } from 'lucide-react'
-import Image from 'next/image'
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import { Activity, Calendar, MapPin, Users } from "lucide-react";
+import Image from "next/image";
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import type { Tables } from '@/types/supabase'
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import type { Tables } from "@/types/supabase";
 
-type Run = Tables<'Runs'>
+type Run = Tables<"Runs">;
 
 interface RunCardProps {
-  run: Run
+  run: Run;
 }
 
 const RUNNING_PLACEHOLDER_IMAGE =
-  'https://images.unsplash.com/photo-1594882645126-14020914d58d?w=600&q=80'
+  "https://images.unsplash.com/photo-1594882645126-14020914d58d?w=600&q=80";
 
 const STATUS_LABEL: Record<string, string> = {
-  closed: '모집완료',
-  open: '모집중',
-}
+  closed: "모집완료",
+  open: "모집중",
+};
 
 export function RunCard({ run }: RunCardProps) {
-  const meetingDate = new Date(run.meeting_at)
-  const isClosed = run.status === 'closed'
+  const meetingDate = new Date(run.meeting_at);
+  const isClosed = run.status === "closed";
 
   return (
     <Card className="group overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className="relative h-44 w-full overflow-hidden">
         <Image
-          src={run.thumbnail_rul ?? RUNNING_PLACEHOLDER_IMAGE}
+          src={run.thumbnail_url ?? RUNNING_PLACEHOLDER_IMAGE}
           alt={run.title}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -40,8 +40,8 @@ export function RunCard({ run }: RunCardProps) {
             <Badge
               className={
                 isClosed
-                  ? 'bg-emerald-500 text-white hover:bg-emerald-500'
-                  : 'bg-orange-600 text-white hover:bg-orange-600'
+                  ? "bg-emerald-500 text-white hover:bg-emerald-500"
+                  : "bg-orange-600 text-white hover:bg-orange-600"
               }
             >
               {STATUS_LABEL[run.status] ?? run.status}
@@ -56,8 +56,10 @@ export function RunCard({ run }: RunCardProps) {
         </h2>
 
         <div className="flex flex-col gap-1.5">
-          <InfoRow icon={<Calendar className="h-4 w-4 text-muted-foreground" />}>
-            {format(meetingDate, 'M월 d일 (EEE) HH:mm', { locale: ko })}
+          <InfoRow
+            icon={<Calendar className="h-4 w-4 text-muted-foreground" />}
+          >
+            {format(meetingDate, "M월 d일 (EEE) HH:mm", { locale: ko })}
           </InfoRow>
 
           <InfoRow icon={<MapPin className="h-4 w-4 text-muted-foreground" />}>
@@ -65,13 +67,15 @@ export function RunCard({ run }: RunCardProps) {
           </InfoRow>
 
           {(run.target_distance_km != null || run.target_pace_minute) && (
-            <InfoRow icon={<Activity className="h-4 w-4 text-muted-foreground" />}>
+            <InfoRow
+              icon={<Activity className="h-4 w-4 text-muted-foreground" />}
+            >
               {[
                 run.target_distance_km != null && `${run.target_distance_km}km`,
                 run.target_pace_minute && `페이스 ${run.target_pace_minute}`,
               ]
                 .filter(Boolean)
-                .join(' · ')}
+                .join(" · ")}
             </InfoRow>
           )}
 
@@ -81,20 +85,20 @@ export function RunCard({ run }: RunCardProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function InfoRow({
   icon,
   children,
 }: {
-  icon: React.ReactNode
-  children: React.ReactNode
+  icon: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
       {icon}
       <span className="truncate">{children}</span>
     </div>
-  )
+  );
 }
