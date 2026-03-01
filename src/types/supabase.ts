@@ -64,6 +64,8 @@ export type Database = {
           max_capacity: number
           meeting_address: string
           meeting_at: string
+          meeting_latitude: number | null
+          meeting_longitude: number | null
           meeting_place_name: string
           status: string | null
           target_distance_km: number | null
@@ -82,6 +84,8 @@ export type Database = {
           max_capacity: number
           meeting_address: string
           meeting_at: string
+          meeting_latitude?: number | null
+          meeting_longitude?: number | null
           meeting_place_name: string
           status?: string | null
           target_distance_km?: number | null
@@ -100,6 +104,8 @@ export type Database = {
           max_capacity?: number
           meeting_address?: string
           meeting_at?: string
+          meeting_latitude?: number | null
+          meeting_longitude?: number | null
           meeting_place_name?: string
           status?: string | null
           target_distance_km?: number | null
