@@ -50,6 +50,9 @@ dependencies:
   react:
     specifier: 19.2.3
     version: 19.2.3
+  react-daum-postcode:
+    specifier: ^4.0.0
+    version: 4.0.0(react@19.2.3)
   react-day-picker:
     specifier: ^9.13.2
     version: 9.13.2(react@19.2.3)
@@ -5989,6 +5992,14 @@ packages:
       iconv-lite: 0.7.2
       unpipe: 1.0.0
     dev: true
+
+  /react-daum-postcode@4.0.0(react@19.2.3):
+    resolution: {integrity: sha512-2CGR8Aa/5637IKaplJXv5m9S/qQWWYBr30FhQ9mK9nXiisVbTvrpU9D4U1mgr8YYCKw2RgcK8daN+F+PJhW+ig==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 19.2.3
+    dev: false
 
   /react-day-picker@9.13.2(react@19.2.3):
     resolution: {integrity: sha512-IMPiXfXVIAuR5Yk58DDPBC8QKClrhdXV+Tr/alBrwrHUw0qDDYB1m5zPNuTnnPIr/gmJ4ChMxmtqPdxm8+R4Eg==}

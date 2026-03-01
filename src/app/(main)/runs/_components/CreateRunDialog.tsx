@@ -8,8 +8,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import imageCompression from "browser-image-compression";
-import { CalendarIcon, ImagePlus, Loader2, Plus, X } from "lucide-react";
+import { CalendarIcon, ImagePlus, Loader2, MapPin, Plus, Search, X } from "lucide-react";
 import { toast } from "sonner";
+import DaumPostcode, { Address } from "react-daum-postcode";
 
 import { createClient } from "@/lib/supabase/client";
 import { runsQueryKey } from "@/hooks/useRuns";
@@ -73,8 +74,10 @@ const createRunSchema = z.object({
   description: z.string().min(10, "설명은 최소 10자 이상이어야 합니다."),
   meeting_date: z.date({ required_error: "날짜를 선택해주세요." }),
   meeting_time: z.string().min(1, "시간을 입력해주세요."),
-  meeting_place_name: z.string().min(1, "장소명을 입력해주세요."),
-  meeting_address: z.string().min(1, "상세 주소를 입력해주세요."),
+  meeting_address: z.string().min(1, "주소를 검색해주세요."),
+  meeting_place_name: z.string().min(1, "상세 장소를 입력해주세요."),
+  meeting_latitude: z.number().optional(),
+  meeting_longitude: z.number().optional(),
   max_capacity: z.coerce
     .number({ invalid_type_error: "숫자를 입력해주세요." })
     .min(1, "최소 1명 이상이어야 합니다."),
@@ -132,8 +135,14 @@ async function createRun({
   const supabase = createClient();
   const imageUrls = await uploadImages(previewFiles);
 
-  const { meeting_date, meeting_time, target_distance_km, ...rest } =
-    formValues;
+  const {
+    meeting_date,
+    meeting_time,
+    target_distance_km,
+    meeting_latitude,
+    meeting_longitude,
+    ...rest
+  } = formValues;
 
   const [hours, minutes] = meeting_time.split(":").map(Number);
   const meetingAt = new Date(meeting_date);
@@ -153,9 +162,21 @@ async function createRun({
         ? null
         : Number(target_distance_km),
     target_pace_minute: rest.target_pace_minute ?? null,
+    meeting_latitude: meeting_latitude ?? null,
+    meeting_longitude: meeting_longitude ?? null,
   });
 
   if (error) throw new Error(`모임 생성 실패: ${error.message}`);
+}
+
+async function fetchCoordinates(
+  address: string,
+): Promise<{ latitude: number; longitude: number } | null> {
+  const res = await fetch(
+    `/api/geocode?query=${encodeURIComponent(address)}`,
+  );
+  if (!res.ok) return null;
+  return res.json();
 }
 
 export function CreateRunDialog() {
@@ -163,6 +184,8 @@ export function CreateRunDialog() {
   const [previewFiles, setPreviewFiles] = useState<PreviewFile[]>([]);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [postcodeOpen, setPostcodeOpen] = useState(false);
+  const [isGeocodingPending, setIsGeocodingPending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -191,10 +214,34 @@ export function CreateRunDialog() {
 
   function handleClose() {
     setOpen(false);
+    setPostcodeOpen(false);
     form.reset();
     previewFiles.forEach(({ previewUrl }) => URL.revokeObjectURL(previewUrl));
     setPreviewFiles([]);
     setThumbnailIndex(null);
+  }
+
+  async function handleAddressSelect(data: Address) {
+    const address = data.roadAddress || data.autoRoadAddress || data.jibunAddress;
+    setPostcodeOpen(false);
+    form.setValue("meeting_address", address, { shouldValidate: true });
+    form.setValue("meeting_latitude", undefined);
+    form.setValue("meeting_longitude", undefined);
+
+    setIsGeocodingPending(true);
+    try {
+      const coords = await fetchCoordinates(address);
+      if (coords) {
+        form.setValue("meeting_latitude", coords.latitude);
+        form.setValue("meeting_longitude", coords.longitude);
+      } else {
+        toast.warning("주소 좌표를 가져오지 못했습니다. 모임은 저장되지만 지도에 표시되지 않을 수 있습니다.");
+      }
+    } catch {
+      toast.warning("좌표 변환 중 오류가 발생했습니다.");
+    } finally {
+      setIsGeocodingPending(false);
+    }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -387,36 +434,74 @@ export function CreateRunDialog() {
             </div>
 
             {/* 장소 */}
-            <FormField
-              control={form.control}
-              name="meeting_place_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>장소명 *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="예: 한강 반포 안내센터" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex flex-col gap-3">
+              <FormField
+                control={form.control}
+                name="meeting_address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>주소 *</FormLabel>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <div className="relative flex-1">
+                          <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                          <Input
+                            placeholder="주소 찾기 버튼을 눌러 검색하세요"
+                            readOnly
+                            className="cursor-default pl-9 bg-muted/40"
+                            {...field}
+                          />
+                          {isGeocodingPending && (
+                            <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+                          )}
+                        </div>
+                      </FormControl>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="shrink-0 gap-1.5"
+                        onClick={() => setPostcodeOpen(true)}
+                      >
+                        <Search className="h-4 w-4" />
+                        주소 찾기
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="meeting_address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>상세 주소 *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="예: 서울특별시 서초구 반포동 734"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="meeting_place_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상세 장소 *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="예: OO역 3번 출구 앞, 한강 반포 안내센터"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* 주소 검색 다이얼로그 */}
+            <Dialog open={postcodeOpen} onOpenChange={setPostcodeOpen}>
+              <DialogContent className="p-0 sm:max-w-md" aria-describedby={undefined}>
+                <DialogHeader className="px-6 pt-6 pb-2">
+                  <DialogTitle>주소 검색</DialogTitle>
+                </DialogHeader>
+                <DaumPostcode
+                  onComplete={handleAddressSelect}
+                  autoClose={false}
+                  style={{ height: 460 }}
+                />
+              </DialogContent>
+            </Dialog>
 
             {/* 정원 / 거리 / 페이스 */}
             <div className="grid grid-cols-3 gap-3">
