@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { addWeeks, endOfWeek, isWithinInterval, startOfWeek } from "date-fns";
 import { Loader2 } from "lucide-react";
 
@@ -100,7 +101,9 @@ export function RunsList() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {group.runs.map((run) => (
-              <RunCard key={run.id} run={run} />
+              <Link key={run.id} href={`/runs/${run.id}`}>
+                <RunCard run={run} />
+              </Link>
             ))}
           </div>
         </section>
