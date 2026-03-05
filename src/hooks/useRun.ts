@@ -14,7 +14,7 @@ async function fetchRun(id: string): Promise<RunWithHost> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("Runs")
-    .select("*, User(*)")
+    .select("*, User(id, nickname, profile_img)")
     .eq("id", id)
     .is("deleted_at", null)
     .single();
