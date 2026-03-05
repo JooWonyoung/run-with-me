@@ -67,7 +67,7 @@ export type Database = {
           meeting_latitude: number | null
           meeting_longitude: number | null
           meeting_place_name: string
-          status: string | null
+          status: Database["public"]["Enums"]["run_status"] | null
           target_distance_km: number | null
           target_pace_minute: string | null
           thumbnail_url: string | null
@@ -87,7 +87,7 @@ export type Database = {
           meeting_latitude?: number | null
           meeting_longitude?: number | null
           meeting_place_name: string
-          status?: string | null
+          status?: Database["public"]["Enums"]["run_status"] | null
           target_distance_km?: number | null
           target_pace_minute?: string | null
           thumbnail_url?: string | null
@@ -107,7 +107,7 @@ export type Database = {
           meeting_latitude?: number | null
           meeting_longitude?: number | null
           meeting_place_name?: string
-          status?: string | null
+          status?: Database["public"]["Enums"]["run_status"] | null
           target_distance_km?: number | null
           target_pace_minute?: string | null
           thumbnail_url?: string | null
@@ -159,7 +159,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      run_status: "open" | "closed" | "canceled" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -286,6 +286,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      run_status: ["open", "closed", "canceled", "completed"],
+    },
   },
 } as const
