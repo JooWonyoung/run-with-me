@@ -46,8 +46,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
-const TEMP_HOST_ID = "51f77065-8159-487d-ad81-22fbcf3d631e";
-
 const TIME_START_HOUR = 5;
 const TIME_END_HOUR = 23;
 const TIME_OPTIONS: { value: string; label: string }[] = Array.from(
@@ -133,6 +131,13 @@ async function createRun({
   thumbnailIndex,
 }: CreateRunPayload) {
   const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("로그인이 필요합니다.");
+
   const imageUrls = await uploadImages(previewFiles);
 
   const {
@@ -153,7 +158,7 @@ async function createRun({
 
   const { error } = await supabase.from("Runs").insert({
     ...rest,
-    host_id: TEMP_HOST_ID,
+    host_id: user.id,
     meeting_at: meetingAt.toISOString(),
     image_urls: imageUrls.length > 0 ? imageUrls : null,
     thumbnail_url: thumbnailUrl,
