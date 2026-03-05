@@ -179,7 +179,11 @@ async function fetchCoordinates(
   return res.json();
 }
 
-export function CreateRunDialog() {
+interface CreateRunDialogProps {
+  size?: "default" | "sm" | "lg" | "icon"
+}
+
+export function CreateRunDialog({ size = "default" }: CreateRunDialogProps) {
   const [open, setOpen] = useState(false);
   const [previewFiles, setPreviewFiles] = useState<PreviewFile[]>([]);
   const [thumbnailIndex, setThumbnailIndex] = useState<number | null>(null);
@@ -310,6 +314,7 @@ export function CreateRunDialog() {
       }}
     >
       <Button
+        size={size}
         className="gap-2 bg-orange-500 hover:bg-orange-600 text-white"
         onClick={() => setOpen(true)}
       >
