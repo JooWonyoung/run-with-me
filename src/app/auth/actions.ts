@@ -4,6 +4,12 @@ import { createClient } from '@/lib/supabase/server'
 import { type Provider } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 
+export async function signOut() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/')
+}
+
 async function signInWithOAuth(provider: Provider) {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
