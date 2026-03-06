@@ -107,7 +107,7 @@ async function uploadImages(files: PreviewFile[]): Promise<string[]> {
   for (const { file } of files) {
     const compressed = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
     const ext = compressed.name.split(".").pop() ?? "jpg";
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = `user_uploads/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
     const { error } = await supabase.storage
       .from("runs_images")
