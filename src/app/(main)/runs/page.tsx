@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Footprints } from 'lucide-react'
 import {
   HydrationBoundary,
@@ -9,6 +8,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { runsQueryKey } from "@/hooks/useRuns";
 import { Button } from "@/components/ui/button";
+import { LoginLink } from "@/components/LoginLink";
 import { RunsList } from "./_components/RunsList";
 
 export default async function RunsPage() {
@@ -57,7 +57,7 @@ export default async function RunsPage() {
               size="sm"
               className="shrink-0 bg-orange-600 text-white hover:bg-orange-700"
             >
-              <Link href="/login">로그인하기</Link>
+              <LoginLink>로그인하기</LoginLink>
             </Button>
           </div>
         )}

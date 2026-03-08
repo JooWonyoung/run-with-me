@@ -3,7 +3,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Footprints } from 'lucide-react'
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<{ next?: string }>
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const { next } = await searchParams
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
       <Card className="w-full max-w-sm rounded-2xl shadow-sm">
@@ -18,6 +23,9 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-3 pt-4">
           <form action={signInWithGoogle}>
+            {next != null && next !== '' && (
+              <input type="hidden" name="next" value={next} />
+            )}
             <Button
               type="submit"
               variant="outline"

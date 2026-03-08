@@ -4,6 +4,7 @@ import { Footprints } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { CreateRunDialog } from '@/components/runs/CreateRunDialog'
+import { LoginLink } from '@/components/LoginLink'
 import UserMenu from './UserMenu'
 
 export default async function Header() {
@@ -45,7 +46,7 @@ export default async function Header() {
           </div>
         ) : (
           <Button asChild variant="outline" size="sm">
-            <Link href="/login">로그인</Link>
+            <LoginLink>로그인</LoginLink>
           </Button>
         )}
       </div>
