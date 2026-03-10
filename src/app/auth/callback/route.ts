@@ -22,6 +22,27 @@ export async function GET(request: NextRequest) {
 
     if (!error) {
       console.log('[Auth] OAuth session exchange successful')
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
+        const { data: userData } = await supabase
+          .from('User')
+          .select('is_onboarded')
+          .eq('id', user.id)
+          .single()
+
+        if (!userData?.is_onboarded) {
+          const onboardingUrl = new URL('/onboarding', origin)
+          if (next !== '/') {
+            onboardingUrl.searchParams.set('next', next)
+          }
+          return NextResponse.redirect(onboardingUrl.toString())
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`)
     }
 

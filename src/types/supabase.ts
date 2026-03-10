@@ -126,25 +126,34 @@ export type Database = {
       }
       User: {
         Row: {
+          birth_year: number | null
           created_at: string
           email: string | null
+          gender: Database["public"]["Enums"]["gender"] | null
           id: string
+          is_onboarded: boolean
           nickname: string | null
           profile_img: string | null
           provider: string | null
         }
         Insert: {
+          birth_year?: number | null
           created_at?: string
           email?: string | null
+          gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
+          is_onboarded?: boolean
           nickname?: string | null
           profile_img?: string | null
           provider?: string | null
         }
         Update: {
+          birth_year?: number | null
           created_at?: string
           email?: string | null
+          gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
+          is_onboarded?: boolean
           nickname?: string | null
           profile_img?: string | null
           provider?: string | null
@@ -159,6 +168,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      gender: "male" | "female" | "none"
       run_status: "open" | "closed" | "canceled" | "completed"
     }
     CompositeTypes: {
@@ -287,6 +297,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      gender: ["male", "female", "none"],
       run_status: ["open", "closed", "canceled", "completed"],
     },
   },
