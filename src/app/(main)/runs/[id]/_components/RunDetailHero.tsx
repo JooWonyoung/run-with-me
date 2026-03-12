@@ -34,7 +34,7 @@ export function RunDetailHero({ run }: Props) {
 
       <div className="flex items-center gap-3">
         <Avatar className="h-9 w-9">
-          <AvatarImage src={hostImg} alt={hostName} />
+          <AvatarImage className="object-cover" src={hostImg} alt={hostName} />
           <AvatarFallback className="bg-orange-100 text-sm font-semibold text-orange-700">
             {hostInitial}
           </AvatarFallback>
