@@ -1,4 +1,8 @@
-import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
 
 import { createClient } from "@/lib/supabase/server";
 import { myRunsQueryKey, fetchMyRunsData } from "@/hooks/useMyRuns";
