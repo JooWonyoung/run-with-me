@@ -132,9 +132,13 @@ export type Database = {
           gender: Database["public"]["Enums"]["gender"] | null
           id: string
           is_onboarded: boolean
+          mbti: string | null
+          message: string | null
           nickname: string | null
           profile_img: string | null
           provider: string | null
+          race_records: Json
+          sns_links: Json
         }
         Insert: {
           birth_year?: number | null
@@ -143,9 +147,13 @@ export type Database = {
           gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
           is_onboarded?: boolean
+          mbti?: string | null
+          message?: string | null
           nickname?: string | null
           profile_img?: string | null
           provider?: string | null
+          race_records?: Json
+          sns_links?: Json
         }
         Update: {
           birth_year?: number | null
@@ -154,9 +162,13 @@ export type Database = {
           gender?: Database["public"]["Enums"]["gender"] | null
           id?: string
           is_onboarded?: boolean
+          mbti?: string | null
+          message?: string | null
           nickname?: string | null
           profile_img?: string | null
           provider?: string | null
+          race_records?: Json
+          sns_links?: Json
         }
         Relationships: []
       }

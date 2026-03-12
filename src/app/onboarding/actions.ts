@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import type { Enums } from '@/types/supabase'
+import type { Enums, Json } from '@/types/supabase'
 
 function getSafeNext(next: string): string {
   const trimmed = next.trim()
@@ -12,10 +12,28 @@ function getSafeNext(next: string): string {
   return '/'
 }
 
+export interface RaceRecord {
+  raceName: string
+  date: string
+  distance: '5km' | '10km' | 'Half' | 'Full'
+  record: string
+}
+
+export interface SNSLinks {
+  instagram?: string
+  strava?: string
+  youtube?: string
+  blog?: string
+}
+
 type CompleteOnboardingParams = {
   profileImageUrl: string
   gender: Enums<'gender'>
   birthYear: string
+  message: string
+  mbti: string
+  raceRecords: RaceRecord[]
+  snsLinks: SNSLinks
   next: string
 }
 
@@ -32,7 +50,7 @@ export async function completeOnboarding(
     redirect('/login')
   }
 
-  const { profileImageUrl, gender, birthYear: birthYearStr, next } = params
+  const { profileImageUrl, gender, birthYear: birthYearStr, message, mbti, raceRecords, snsLinks, next } = params
   const birthYear = parseInt(birthYearStr, 10)
   const nextPath = getSafeNext(next || '/')
 
@@ -48,12 +66,20 @@ export async function completeOnboarding(
     return { error: '출생년도를 선택해 주세요.' }
   }
 
+  const cleanedSnsLinks: SNSLinks = Object.fromEntries(
+    Object.entries(snsLinks).filter(([, v]) => v && v.trim() !== '')
+  ) as SNSLinks
+
   const { error: updateError } = await supabase
     .from('User')
     .update({
       gender,
       birth_year: birthYear,
       profile_img: profileImageUrl,
+      message: message.trim() || null,
+      mbti: mbti.trim() || null,
+      race_records: raceRecords as unknown as Json,
+      sns_links: cleanedSnsLinks as unknown as Json,
       is_onboarded: true,
     })
     .eq('id', user.id)
