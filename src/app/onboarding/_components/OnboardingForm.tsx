@@ -1,124 +1,130 @@
-'use client'
+"use client";
 
-import { useState, useTransition, useRef, type ChangeEvent } from 'react'
-import Image from 'next/image'
-import { Camera, AlertCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
+import { useState, useTransition, useRef, type ChangeEvent } from "react";
+import Image from "next/image";
+import { Camera, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Card, CardContent } from '@/components/ui/card'
-import { completeOnboarding } from '../actions'
-import { createClient } from '@/lib/supabase/client'
-import type { Enums } from '@/types/supabase'
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { completeOnboarding } from "../actions";
+import { createClient } from "@/lib/supabase/client";
+import type { Enums } from "@/types/supabase";
 
-type Gender = Enums<'gender'>
+type Gender = Enums<"gender">;
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
-  { value: 'male', label: '남성' },
-  { value: 'female', label: '여성' },
-  { value: 'none', label: '선택 안함' },
-]
+  { value: "male", label: "남성" },
+  { value: "female", label: "여성" },
+  { value: "none", label: "선택 안함" },
+];
 
-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
-const CURRENT_YEAR = new Date().getFullYear()
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const CURRENT_YEAR = new Date().getFullYear();
 const BIRTH_YEARS = Array.from(
   { length: CURRENT_YEAR - 1939 - 16 },
-  (_, i) => CURRENT_YEAR - 16 - i
-)
+  (_, i) => CURRENT_YEAR - 16 - i,
+);
 
 type OnboardingFormProps = {
-  next: string
-}
+  next: string;
+};
 
 export function OnboardingForm({ next }: OnboardingFormProps) {
-  const [profileFile, setProfileFile] = useState<File | null>(null)
-  const [profilePreview, setProfilePreview] = useState<string | null>(null)
-  const [gender, setGender] = useState<Gender | null>(null)
-  const [birthYear, setBirthYear] = useState<string>('')
-  const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [birthYear, setBirthYear] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setError('이미지 파일만 업로드 가능합니다.')
-      return
+    if (!file.type.startsWith("image/")) {
+      setError("이미지 파일만 업로드 가능합니다.");
+      return;
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      setError('파일 크기는 5MB 이하여야 합니다.')
-      return
+      setError("파일 크기는 5MB 이하여야 합니다.");
+      return;
     }
 
-    setError(null)
-    setProfileFile(file)
+    setError(null);
+    setProfileFile(file);
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (ev) => {
-      setProfilePreview(ev.target?.result as string)
-    }
-    reader.readAsDataURL(file)
+      setProfilePreview(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!profileFile) {
-      setError('프로필 사진을 등록해 주세요.')
-      return
+      setError("프로필 사진을 등록해 주세요.");
+      return;
     }
     if (!gender) {
-      setError('성별을 선택해 주세요.')
-      return
+      setError("성별을 선택해 주세요.");
+      return;
     }
     if (!birthYear) {
-      setError('출생년도를 선택해 주세요.')
-      return
+      setError("출생년도를 선택해 주세요.");
+      return;
     }
 
-    setError(null)
+    setError(null);
     startTransition(async () => {
-      const supabase = createClient()
+      const supabase = createClient();
 
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
-        setError('로그인이 필요합니다.')
-        return
+        setError("로그인이 필요합니다.");
+        return;
       }
 
-      const fileExt = profileFile.name.split('.').pop() ?? 'jpg'
-      const filePath = `user-uploads/profiles/${user.id}.${fileExt}`
+      const fileExt = profileFile.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const filePath = `user-uploads/profiles/${user.id}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('run-images')
-        .upload(filePath, profileFile, { upsert: true, contentType: profileFile.type })
+        .from("runs_images")
+        .upload(filePath, profileFile, {
+          contentType: profileFile.type,
+        });
 
       if (uploadError) {
-        setError('이미지 업로드에 실패했습니다. 다시 시도해 주세요.')
-        return
+        setError("이미지 업로드에 실패했습니다. 다시 시도해 주세요.");
+        return;
       }
 
-      const { data: { publicUrl } } = supabase.storage.from('run-images').getPublicUrl(filePath)
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("runs_images").getPublicUrl(filePath);
 
       const result = await completeOnboarding({
         profileImageUrl: publicUrl,
         gender,
         birthYear,
         next,
-      })
+      });
       if (result?.error) {
-        setError(result.error)
+        setError(result.error);
       }
-    })
+    });
   }
 
   return (
@@ -187,8 +193,8 @@ export function OnboardingForm({ next }: OnboardingFormProps) {
               onClick={() => setGender(value)}
               className={`flex-1 rounded-xl border py-3 text-sm font-medium transition-all ${
                 gender === value
-                  ? 'border-orange-500 bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400'
+                  ? "border-orange-500 bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
               }`}
             >
               {label}
@@ -201,7 +207,7 @@ export function OnboardingForm({ next }: OnboardingFormProps) {
       <div className="space-y-2">
         <Label className="text-sm font-medium">출생년도</Label>
         <Select value={birthYear} onValueChange={setBirthYear}>
-          <SelectTrigger className="rounded-xl">
+          <SelectTrigger className="rounded-xl bg-white">
             <SelectValue placeholder="출생년도를 선택해 주세요" />
           </SelectTrigger>
           <SelectContent>
@@ -227,8 +233,8 @@ export function OnboardingForm({ next }: OnboardingFormProps) {
         disabled={isPending}
         className="w-full rounded-xl bg-orange-500 py-5 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
       >
-        {isPending ? '저장 중...' : '시작하기'}
+        {isPending ? "저장 중..." : "시작하기"}
       </Button>
     </form>
-  )
+  );
 }
