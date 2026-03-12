@@ -8,7 +8,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import imageCompression from "browser-image-compression";
-import { CalendarIcon, ImagePlus, Loader2, MapPin, Plus, Search, X } from "lucide-react";
+import {
+  CalendarIcon,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  Plus,
+  Search,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import DaumPostcode, { Address } from "react-daum-postcode";
 
@@ -110,13 +118,13 @@ async function uploadImages(files: PreviewFile[]): Promise<string[]> {
     const path = `user-uploads/runs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
     const { error } = await supabase.storage
-      .from("run-images")
+      .from("runs_images")
       .upload(path, compressed, { contentType: compressed.type });
 
     if (error) throw new Error(`이미지 업로드 실패: ${error.message}`);
 
     const { data: urlData } = supabase.storage
-      .from("run-images")
+      .from("runs_images")
       .getPublicUrl(path);
 
     uploadedUrls.push(urlData.publicUrl);
@@ -177,15 +185,13 @@ async function createRun({
 async function fetchCoordinates(
   address: string,
 ): Promise<{ latitude: number; longitude: number } | null> {
-  const res = await fetch(
-    `/api/geocode?query=${encodeURIComponent(address)}`,
-  );
+  const res = await fetch(`/api/geocode?query=${encodeURIComponent(address)}`);
   if (!res.ok) return null;
   return res.json();
 }
 
 interface CreateRunDialogProps {
-  size?: "default" | "sm" | "lg" | "icon"
+  size?: "default" | "sm" | "lg" | "icon";
 }
 
 export function CreateRunDialog({ size = "default" }: CreateRunDialogProps) {
@@ -231,7 +237,8 @@ export function CreateRunDialog({ size = "default" }: CreateRunDialogProps) {
   }
 
   async function handleAddressSelect(data: Address) {
-    const address = data.roadAddress || data.autoRoadAddress || data.jibunAddress;
+    const address =
+      data.roadAddress || data.autoRoadAddress || data.jibunAddress;
     setPostcodeOpen(false);
     form.setValue("meeting_address", address, { shouldValidate: true });
     form.setValue("meeting_latitude", undefined);
@@ -244,7 +251,9 @@ export function CreateRunDialog({ size = "default" }: CreateRunDialogProps) {
         form.setValue("meeting_latitude", coords.latitude);
         form.setValue("meeting_longitude", coords.longitude);
       } else {
-        toast.warning("주소 좌표를 가져오지 못했습니다. 모임은 저장되지만 지도에 표시되지 않을 수 있습니다.");
+        toast.warning(
+          "주소 좌표를 가져오지 못했습니다. 모임은 저장되지만 지도에 표시되지 않을 수 있습니다.",
+        );
       }
     } catch {
       toast.warning("좌표 변환 중 오류가 발생했습니다.");
@@ -501,7 +510,10 @@ export function CreateRunDialog({ size = "default" }: CreateRunDialogProps) {
 
             {/* 주소 검색 다이얼로그 */}
             <Dialog open={postcodeOpen} onOpenChange={setPostcodeOpen}>
-              <DialogContent className="p-0 sm:max-w-md" aria-describedby={undefined}>
+              <DialogContent
+                className="p-0 sm:max-w-md"
+                aria-describedby={undefined}
+              >
                 <DialogHeader className="px-6 pt-6 pb-2">
                   <DialogTitle>주소 검색</DialogTitle>
                 </DialogHeader>

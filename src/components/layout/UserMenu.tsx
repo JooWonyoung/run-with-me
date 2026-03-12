@@ -1,25 +1,31 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { LogOut, Settings, Users } from 'lucide-react'
+import { useState } from "react";
+import Link from "next/link";
+import { LogOut, Settings, Users } from "lucide-react";
 
-import { signOut } from '@/app/auth/actions'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { signOut } from "@/app/auth/actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
+
+type ImgStatus = "idle" | "loading" | "loaded" | "error";
 
 interface UserMenuProps {
-  nickname: string | null
-  profileImg: string | null
+  nickname: string | null;
+  profileImg: string | null;
 }
 
 export default function UserMenu({ nickname, profileImg }: UserMenuProps) {
-  const initials = nickname?.[0]?.toUpperCase() ?? 'U'
+  const initials = nickname?.[0]?.toUpperCase() ?? "U";
+  const [imgStatus, setImgStatus] = useState<ImgStatus>(
+    profileImg ? "loading" : "idle",
+  );
 
   return (
     <DropdownMenu>
@@ -29,9 +35,18 @@ export default function UserMenu({ nickname, profileImg }: UserMenuProps) {
           aria-label="프로필 메뉴"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src={profileImg ?? undefined} alt={nickname ?? '프로필'} />
-            <AvatarFallback className="bg-orange-100 text-xs font-semibold text-orange-700">
-              {initials}
+            <AvatarImage
+              className="object-cover"
+              src={profileImg ?? undefined}
+              alt={nickname ?? "프로필"}
+              onLoadingStatusChange={(s) => setImgStatus(s as ImgStatus)}
+            />
+            <AvatarFallback className="bg-orange-100 text-xs font-semibold text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
+              {imgStatus === "loading" ? (
+                <span className="block size-full animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+              ) : (
+                initials
+              )}
             </AvatarFallback>
           </Avatar>
         </button>
@@ -48,14 +63,19 @@ export default function UserMenu({ nickname, profileImg }: UserMenuProps) {
         )}
 
         <DropdownMenuItem asChild>
-          <Link href="/my/runs" className="flex cursor-pointer items-center gap-2">
-            <Users className="h-4 w-4" />
-            내 러닝 모임
+          <Link
+            href="/my/runs"
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <Users className="h-4 w-4" />내 러닝 모임
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/my/profile" className="flex cursor-pointer items-center gap-2">
+          <Link
+            href="/my/profile"
+            className="flex cursor-pointer items-center gap-2"
+          >
             <Settings className="h-4 w-4" />
             프로필 설정
           </Link>
@@ -63,7 +83,10 @@ export default function UserMenu({ nickname, profileImg }: UserMenuProps) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive" asChild>
+        <DropdownMenuItem
+          className="cursor-pointer text-destructive focus:text-destructive"
+          asChild
+        >
           <form action={signOut} className="w-full">
             <button type="submit" className="flex w-full items-center gap-2">
               <LogOut className="h-4 w-4" />
@@ -73,5 +96,5 @@ export default function UserMenu({ nickname, profileImg }: UserMenuProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
