@@ -7,9 +7,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ApplicationWithRun } from "@/hooks/useMyRuns";
-
-const RUNNING_PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1594882645126-14020914d58d?w=600&q=80";
+import { DEFAULT_RUN_IMAGE } from "@/lib/constants/images";
 
 interface ParticipantRunCardProps {
   application: ApplicationWithRun;
@@ -78,7 +76,7 @@ export function ParticipantRunCard({
       >
         <div className="relative h-40 w-full overflow-hidden sm:h-44">
           <Image
-            src={run.thumbnail_url ?? RUNNING_PLACEHOLDER_IMAGE}
+            src={run.thumbnail_url ?? DEFAULT_RUN_IMAGE}
             alt={run.title}
             fill
             className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
