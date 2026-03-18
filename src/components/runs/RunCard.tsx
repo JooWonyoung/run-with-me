@@ -5,6 +5,7 @@ import Image from "next/image";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { DEFAULT_RUN_IMAGE } from "@/lib/constants/images";
 import type { Tables } from "@/types/supabase";
 
 type Run = Tables<"Runs">;
@@ -12,9 +13,6 @@ type Run = Tables<"Runs">;
 interface RunCardProps {
   run: Run;
 }
-
-const RUNNING_PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1594882645126-14020914d58d?w=600&q=80";
 
 const STATUS_LABEL: Record<string, string> = {
   closed: "모집완료",
@@ -29,7 +27,7 @@ export function RunCard({ run }: RunCardProps) {
     <Card className="group overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
       <div className="relative h-44 w-full overflow-hidden">
         <Image
-          src={run.thumbnail_url ?? RUNNING_PLACEHOLDER_IMAGE}
+          src={run.thumbnail_url ?? DEFAULT_RUN_IMAGE}
           alt={run.title}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"

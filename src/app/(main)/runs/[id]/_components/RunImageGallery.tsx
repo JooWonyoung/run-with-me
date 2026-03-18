@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { DEFAULT_RUN_IMAGE } from "@/lib/constants/images";
 import { RunWithHost } from "@/hooks/useRun";
-
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&q=80";
 
 interface Props {
   run: RunWithHost;
@@ -14,7 +13,7 @@ export function RunImageGallery({ run }: Props) {
     ? run.image_urls
     : run.thumbnail_url
       ? [run.thumbnail_url]
-      : [FALLBACK_IMAGE];
+      : [DEFAULT_RUN_IMAGE];
 
   if (images.length === 1) {
     return (
