@@ -19,21 +19,21 @@ export type Database = {
           created_at: string
           id: string
           run_id: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["application_status"] | null
           user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           run_id?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["application_status"] | null
           user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           run_id?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["application_status"] | null
           user_id?: string | null
         }
         Relationships: [
@@ -180,6 +180,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      application_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "canceled"
+        | "completed"
       gender: "male" | "female" | "none"
       run_status: "open" | "closed" | "canceled" | "completed"
     }
@@ -309,6 +315,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "canceled",
+        "completed",
+      ],
       gender: ["male", "female", "none"],
       run_status: ["open", "closed", "canceled", "completed"],
     },

@@ -4,10 +4,10 @@ import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RunWithHost } from "@/hooks/useRun";
+import { ApplyButton } from "./ApplyButton";
 
 interface Props {
   run: RunWithHost;
@@ -45,12 +45,7 @@ export function RunInfoSidebar({ run }: Props) {
 
         <Separator />
 
-        <Button
-          className="w-full rounded-xl bg-orange-600 font-semibold hover:bg-orange-700"
-          disabled={!isOpen}
-        >
-          {isOpen ? "참가 신청하기" : "모집 마감"}
-        </Button>
+        <ApplyButton run={run} />
 
         {!isOpen && (
           <p className="text-center text-xs text-muted-foreground">
