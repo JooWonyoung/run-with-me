@@ -90,7 +90,15 @@ export async function fetchMyRunsData(
       new Date(a.run.meeting_at).getTime()
   );
 
-  const totalDistanceKm = history.reduce(
+  const COUNTED_APPLICATION_STATUSES = new Set(["approved", "completed"]);
+
+  const countableHistory = history.filter(
+    (item) =>
+      item.kind === "hosted" ||
+      COUNTED_APPLICATION_STATUSES.has(item.application.status ?? "")
+  );
+
+  const totalDistanceKm = countableHistory.reduce(
     (sum, item) => sum + (item.run.target_distance_km ?? 0),
     0
   );
@@ -100,7 +108,7 @@ export async function fetchMyRunsData(
     upcomingHostedRuns,
     upcomingParticipantRuns,
     history,
-    stats: { totalCount: history.length, totalDistanceKm },
+    stats: { totalCount: countableHistory.length, totalDistanceKm },
   };
 }
 
